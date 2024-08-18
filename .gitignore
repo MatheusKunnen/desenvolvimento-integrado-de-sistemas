@@ -31,4 +31,10 @@
 *.out
 *.app
 
+__pycache__
 build
+old
+.venv
+*.sqlite
+*.json
+*.DS_Store
