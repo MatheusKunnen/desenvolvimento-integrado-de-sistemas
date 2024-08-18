@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request, send_file
+from flask import make_response, request, send_file
 from flask_classful import FlaskView
 import io
 
