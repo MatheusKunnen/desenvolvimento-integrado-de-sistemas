@@ -2,7 +2,7 @@
 
 # API Servidor
 
-## POST /image
+## POST /job
 
 Request:
 
@@ -23,7 +23,9 @@ Response:
 }
 ```
 
-## GET /image/:job_id
+## GET /job/:job_id
+
+**OBS:** com o parametro `?minimal=true` retorna unicamente o status.
 
 Response:
 
@@ -43,6 +45,6 @@ Response:
 }
 ```
 
-## GET /image/:job_id/image
+## GET /job/image/:job_id
 
 Response: `PNG image`
