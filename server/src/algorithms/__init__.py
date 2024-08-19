@@ -1,0 +1,1 @@
+from .CGNRAlgorithm import CGNRAlgorithm
