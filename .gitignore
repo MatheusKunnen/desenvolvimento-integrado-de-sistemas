@@ -38,3 +38,5 @@ old
 *.sqlite
 *.json
 *.DS_Store
+*.png
+*.csv
