@@ -6,7 +6,7 @@ class Server:
     def __init__(self):
         self.__db = Database('sqlite:///teste.sqlite')
         self.__job_manager = JobManager(self.__db)
-        self.__http_server = ApiServer(self.__db)
+        self.__http_server = ApiServer(self.__db, self.__job_manager)
         JobBase.metadata.create_all(self.__db.getEngine())
 
     def run(self):

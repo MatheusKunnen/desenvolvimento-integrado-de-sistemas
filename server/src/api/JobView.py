@@ -3,15 +3,19 @@ from flask_classful import FlaskView
 import io
 
 from src.db import Database
+from src.manager import JobManager
+
 from src.models.Job import Job
 
 class JobView(FlaskView):
 
     def __init__(self, args):
         self.__db:Database = args[0]
+        self.__job_m:JobManager = args[1]
     
     def post(self):
         session = self.__db.getSession()
+        job = None
         try:
             job = Job.FromJson(request.json)
 
@@ -21,9 +25,13 @@ class JobView(FlaskView):
             return {'data':{'job_id':job.job_id}}, 201;     
         except Exception as e:
             print(e)
-            session.flush()       
+            session.flush() 
+            return {'error': f'Unexpected error {e}'},500      
         finally:
             session.close()
+            if job is not None:
+                self.__job_m.addJob(job.getQueueDict())
+
     
     def get(self, job_id):
         session = self.__db.getSession()
