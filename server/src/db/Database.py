@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 class Database:
     def __init__(self, db_uri):
-        self.__engine = db.create_engine(db_uri, echo=True)
+        self.__engine = db.create_engine(db_uri, echo=False)
         self.__Session = sessionmaker(bind=self.__engine)
 
     def getEngine(self):
