@@ -46,6 +46,12 @@ class LocalConfig:
     def getMaxModelWorkers(self):
         return self.get('max_model_workers', math.floor(os.cpu_count()/2))
     
+    def getAnalyticsPollingTime(self):
+        return self.get('analytics_polling_time', 1)
+    
+    def getAnalyticsVerbose(self):
+        return self.get('analytics_verbose', False)
+    
     def get(self, key:str, default):
         if self.__config_data.get(key) is None:
             return default
