@@ -2,6 +2,7 @@ from flask import request
 from flask_classful import FlaskView
 
 from src.db import Database
+from src.config import LocalConfig
 
 from src.models.AppInfo import AppInfo
 
@@ -15,7 +16,7 @@ class AnalyticsView(FlaskView):
         try:
             minimal = request.args.get('minimal') == 'true'
 
-            rows = session.query(AppInfo).order_by(AppInfo.created_at.desc()).limit(600).all()
+            rows = session.query(AppInfo).order_by(AppInfo.created_at.desc()).limit(LocalConfig.GetDefault().getAnalyticsRowsLimit()).all()
             
             data=[]
             for row in rows:

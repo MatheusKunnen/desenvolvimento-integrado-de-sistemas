@@ -10,17 +10,19 @@ from datetime import datetime
 from multiprocessing import Queue
 
 from src.algorithms import CGNRAlgorithm
+
 class Worker:
-    def __init__(self, id:int, input_queue:Queue, output_queue:Queue, models_timeout_s: int = 30):
+    def __init__(self, id:int, input_queue:Queue, output_queue:Queue, models_timeout_s: int = 30, max_error=1e-6):
         self.__id = id
         self.__pid = os.getpid()
         self.__input_queue = input_queue
         self.__output_queue = output_queue
         self.__models_timeout_s = models_timeout_s
+        self.__max_error = max_error
         self.__models = [None, None]
 
     def run(self):
-        self.print('Started...')
+        self.print('Running...')
         while True:
             try:
                 timeout = self.__models_timeout_s if self.isModelLoaded() else None
@@ -45,7 +47,7 @@ class Worker:
             H = self.getModel(job["model"])
             job["started_at"] = datetime.now()
 
-            algo = CGNRAlgorithm(H)
+            algo = CGNRAlgorithm(H, max_error=self.__max_error)
             
             signal = self.getSignal(job["signal"])
             

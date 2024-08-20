@@ -9,13 +9,16 @@ from threading import Thread
 from sqlalchemy import update
 
 from .Worker import Worker
+
 from src.db import Database
+from src.config import LocalConfig
+
 from src.models.Job import Job
 from src.models.AppInfo import AppInfo
 
-def worker_entry(id, input_q, output_q):
+def worker_entry(id, input_q, output_q, timeout, max_error):
     try:
-        w = Worker(id, input_q, output_q)
+        w = Worker(id, input_q, output_q, timeout, max_error)
         w.run()
     except Exception as e:
         print(e)
@@ -33,7 +36,7 @@ class JobManager:
         self.__jobs_db = jobs_db
         self.__analytics_db = analytics_db
 
-        self.__n_workers = 4
+        self.__n_workers = LocalConfig.GetDefault().getMaxModelWorkers()
         self.__processes: List[Process] = []
         self.__r_thread = None
         self.__m_thread = None
@@ -57,8 +60,10 @@ class JobManager:
         self.__m_thread.start()
 
     def __initWorkers(self):
-        for i in range(self.__n_workers):
-            p = Process(target=worker_entry, args=(i, self.__jobs_queue, self.__results_queue), daemon=True)
+        timeout = LocalConfig.GetDefault().getModelClearTimeout()
+        max_error = LocalConfig.GetDefault().getModelMaxError()
+        for i in range(self.__n_workers):            
+            p = Process(target=worker_entry, args=(i, self.__jobs_queue, self.__results_queue, timeout, max_error), daemon=True)
             self.__processes.append(p)
         
         for p in self.__processes:
