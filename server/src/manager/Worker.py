@@ -32,13 +32,11 @@ class Worker:
                 gc.collect()
             except Exception as e:
                 if self.__input_queue.empty():
-                    print('Queue empty, clearing models')
+                    self.print('Queue empty, clearing models')
                     self.__models = [None, None]
                     gc.collect()
                 else:
                     self.print(f'Error: {e}')
-
-
         self.print('Finished...')
 
     def executeJob(self, job):

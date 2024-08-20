@@ -23,5 +23,4 @@ class ApiServer:
     def run(self):
         http_server = WSGIServer(('0.0.0.0', 5005), self.__app)
         http_server.serve_forever()
-        # self.__app.run(port=5005, debug=True)
     
