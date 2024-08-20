@@ -1,53 +1,63 @@
 import os
 import json
+import gc
 import numpy as np
+from math import sqrt, floor
+
 from io import BytesIO
+from PIL import Image
 from datetime import datetime
 from multiprocessing import Queue
 
 from src.algorithms import CGNRAlgorithm
 class Worker:
-    def __init__(self, id:int, input_queue:Queue, output_queue:Queue):
+    def __init__(self, id:int, input_queue:Queue, output_queue:Queue, models_timeout_s: int = 30):
         self.__id = id
         self.__pid = os.getpid()
         self.__input_queue = input_queue
         self.__output_queue = output_queue
-        self.__H = None
+        self.__models_timeout_s = models_timeout_s
+        self.__models = [None, None]
 
     def run(self):
-        self.print('Running...')
+        self.print('Started...')
         while True:
             try:
-                job = self.__input_queue.get()
+                timeout = self.__models_timeout_s if self.isModelLoaded() else None
+                job = self.__input_queue.get(timeout=timeout)
                 
                 output = self.executeJob(job)
 
                 self.__output_queue.put(output)
+                gc.collect()
             except Exception as e:
-                self.print(f'Error: {e}')
+                if self.__input_queue.empty():
+                    self.print('Queue empty, clearing models')
+                    self.__models = [None, None]
+                    gc.collect()
+                else:
+                    self.print(f'Error: {e}')
+        self.print('Finished...')
 
     def executeJob(self, job):
         self.print(f'Starting job {job["job_id"]}')
         try:
-            self.loadModel(job["model"])
+            H = self.getModel(job["model"])
             job["started_at"] = datetime.now()
 
-            algo = CGNRAlgorithm(self.__H)
+            algo = CGNRAlgorithm(H)
             
-            data = json.loads(job["signal"].decode('utf-8'))
-            signal = np.array(data, dtype=np.float64)
-            signal.shape = (signal.shape[0], 1)
+            signal = self.getSignal(job["signal"])
             
-            img,it  = algo.processSignal(signal)
+            output, it, error  = algo.processSignal(signal)
 
-            bytesio = BytesIO()
+            image, image_bytes = self.outputToImage(output)
 
-            img.save(bytesio, format="png")
-
-            job["image"] = bytesio.getvalue()
+            job["image"] = image_bytes
             job["finished_at"] = datetime.now()
             
-            img.save(f'./img/{job["job_id"]}.png', format="png")
+            # DEBUG
+            image.save(f'./img/{job["job_id"]}.png', format="png")
 
             self.print(f'Job {job["job_id"]} finished')
 
@@ -62,14 +72,39 @@ class Worker:
             self.print(f'Job {job["job_id"]} FAILED')
             raise e
         
-    def loadModel(self, model: int):
-        # print("Model: ", model)
-        if self.__H is None:
-            self.__H = np.loadtxt('./data/H-2.csv', delimiter=',', dtype=np.float64)
-            self.__H = np.asarray(self.__H, dtype=np.float64)
+    def getSignal(self, raw_signal: bytes):
+        data = json.loads(raw_signal.decode('utf-8'))
+        signal = np.array(data, dtype=np.float64)
+        signal.shape = (signal.shape[0], 1)
+        return signal
+    
+    def outputToImage(self, image_arr: np.array):
+        img_size = floor(sqrt(image_arr.shape[1]))
 
+        image_arr *= 255
+        image_arr = np.reshape(image_arr, (img_size, img_size), order="F")
+        
+        img = Image.fromarray(image_arr)
+        img = img.convert('L')
+
+        bytesio = BytesIO()
+        img.save(bytesio, format="png")
+
+        return img, bytesio.getvalue()
+
+    def getModel(self, model: int):
+        if model != 1 and model != 2:
+            raise ValueError(f'Model {model} is not implemented')
+        model -= 1
+        if self.__models[model] is None:
+            self.__models[model] = np.loadtxt(f'./data/H-{int(model+1)}.csv', delimiter=',', dtype=np.float64)
+
+        return self.__models[model]
+    
+    def isModelLoaded(self):
+        return self.__models[0] is not None or self.__models[1] is not None
         
     def print(self, msg):
-        print(f'[{self.__pid}] Worker {self.__id}:', msg)     
+        print(f'[{self.__pid}] W{self.__id}:', msg)     
 
 

@@ -1,10 +1,15 @@
 import numpy as np
-from PIL import Image
 
 class CGNRAlgorithm:
-    def __init__(self, H: np.array):
-        self.__H = H
 
+    def __init__(self, H: np.array, max_error: float = 1e-6):
+        self.__H = H
+        self.__max_error = max_error
+
+    @property
+    def max_error(self):
+        return self.__max_error
+    
     def processSignal(self, signal: np.array):
         H = self.__H
         r = signal
@@ -15,12 +20,10 @@ class CGNRAlgorithm:
         # f0=0
         image = np.zeros_like(len(p))
 
-        erro = 1
-
-        cont = 0
-
-        while erro > 1e-6:
-            cont += 1
+        error = self.max_error+1
+        iterations = 0
+        while error > self.max_error:
+            iterations += 1
             # 𝐰𝐢=𝐇𝐩𝐢
             w = np.matmul(H, p)
             # 𝛼𝑖=||𝐳𝐢||22/||𝐰𝐢||22
@@ -32,9 +35,9 @@ class CGNRAlgorithm:
             r_aux = r - alpha * np.dot(H, p) 
 
             # ϵ=ri+12−ri2
-            erro = abs(np.linalg.norm(r_aux) - np.linalg.norm(r))
-            # print('error', erro, erro > 1e-6 )
-            if erro < 1e-6:
+            error = abs(np.linalg.norm(r_aux) - np.linalg.norm(r))
+
+            if error < self.max_error:
                 break
             
             # βi=rTi+1ri+1rTiri
@@ -44,16 +47,4 @@ class CGNRAlgorithm:
             
             r = r_aux
 
-        print('Iterações:', cont)
-
-        image = image - image.min()
-        image = image / image.max()
-        image = image * 255
-        
-        image = np.reshape(image, (30, 30), order='F')
-        # print(image)
-        
-        img = Image.fromarray(image)
-        img = img.convert("L")
-        
-        return img, cont
+        return image, iterations, error

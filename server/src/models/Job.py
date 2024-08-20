@@ -7,9 +7,6 @@ from src.utils.uuidv7 import uuid7
 
 from datetime import datetime
 
-from PIL import Image
-from io import BytesIO
-
 JobBase = declarative_base()
 
 class Job(JobBase):
@@ -67,10 +64,6 @@ class Job(JobBase):
     
     @staticmethod
     def FromJson(data:dict):
-        # im = Image.open('/Users/matheuskunnen/Downloads/codigo-b.png')
-        # bytes = BytesIO()
-        # im.save(bytes, format='png')
-        # bytes.seek(0)
         return Job(
             job_id=data['job_id'] if data.get('job_id') is not None else uuid7(as_type='str'),
             status=data['status'] if data.get('state') is not None else 'pending',
@@ -81,5 +74,4 @@ class Job(JobBase):
             algorithm=data['algorithm'] if data.get('state') is not None else 'cgnr',
             image_size='30x30' if data['model'] == 1 else '60x60',
             created_at=datetime.now()
-            # image= bytes.read()
         )
