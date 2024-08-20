@@ -5,12 +5,14 @@ from src.db import Database
 from src.manager import JobManager
 
 from .JobView import JobView
+from .AnalyticsView import AnalyticsView
 
 class ApiServer:
     __FlaskApp = None
     
-    def __init__(self, db: Database, job_m: JobManager):
-        self.__db = db
+    def __init__(self, jobs_db: Database, analytics_db: Database, job_m: JobManager):
+        self.__jobs_db = jobs_db
+        self.__analytics_db = analytics_db
         self.__job_m = job_m
 
         if ApiServer.__FlaskApp is None:
@@ -18,7 +20,8 @@ class ApiServer:
 
         self.__app = ApiServer.__FlaskApp
 
-        JobView.register(self.__app, route_base='/job', init_argument=(self.__db, self.__job_m, ...) )
+        JobView.register(self.__app, route_base='/job', init_argument=(self.__jobs_db, self.__job_m, ...) )
+        AnalyticsView.register(self.__app, route_base='/analytics', init_argument=(self.__analytics_db, ...) )
 
     def run(self):
         http_server = WSGIServer(('0.0.0.0', 5005), self.__app)

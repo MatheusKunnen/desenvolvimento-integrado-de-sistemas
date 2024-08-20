@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float, DateTime
 
@@ -19,8 +21,9 @@ class AppInfo(AnalyticsBase):
     workers_info = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
         
-    def getDict(self):
+    def getDict(self, minimal=False):
         return dict({
+                    'id': self.id,
                     'main_cpu_pct': self.main_cpu_pct,
                     'main_mem_rss': self.main_mem_rss,
                     'workers_cpu_pct': self.workers_cpu_pct,
@@ -28,8 +31,8 @@ class AppInfo(AnalyticsBase):
                     'jobs_queue': self.jobs_queue,
                     'results_queue': self.results_queue,
                     'workers': self.workers,
-                    'workers_info': self.workers_info,
-                    'created_at': self.created_at
+                    'workers_info': AppInfo.__GetJSON(self.workers_info) if not minimal else None,
+                    'created_at': self.created_at.isoformat()
                 })
     
     @staticmethod
@@ -46,3 +49,10 @@ class AppInfo(AnalyticsBase):
             workers_info = data['workers_info'],
             created_at = data['created_at']
         )
+    
+    @staticmethod
+    def __GetJSON(data:str):
+        try:
+            return json.loads(data)
+        except:
+            return {}

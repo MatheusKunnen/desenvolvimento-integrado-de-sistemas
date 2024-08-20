@@ -13,7 +13,7 @@ class Server:
         AnalyticsBase.metadata.create_all(self.__analytics_db.getEngine())
 
         self.__job_manager = JobManager(self.__jobs_db, self.__analytics_db)
-        self.__http_server = ApiServer(self.__jobs_db, self.__job_manager)
+        self.__http_server = ApiServer(self.__jobs_db, self.__analytics_db, self.__job_manager)
 
     def run(self):
         self.__http_server.run()
