@@ -1,5 +1,6 @@
 import os
 import json
+import gc
 import numpy as np
 from math import sqrt, floor
 
@@ -10,24 +11,34 @@ from multiprocessing import Queue
 
 from src.algorithms import CGNRAlgorithm
 class Worker:
-    def __init__(self, id:int, input_queue:Queue, output_queue:Queue):
+    def __init__(self, id:int, input_queue:Queue, output_queue:Queue, models_timeout_s: int = 30):
         self.__id = id
         self.__pid = os.getpid()
         self.__input_queue = input_queue
         self.__output_queue = output_queue
+        self.__models_timeout_s = models_timeout_s
         self.__models = [None, None]
 
     def run(self):
         self.print('Started...')
         while True:
             try:
-                job = self.__input_queue.get()
+                timeout = self.__models_timeout_s if self.isModelLoaded() else None
+                job = self.__input_queue.get(timeout=timeout)
                 
                 output = self.executeJob(job)
 
                 self.__output_queue.put(output)
+                gc.collect()
             except Exception as e:
-                self.print(f'Error: {e}')
+                if self.__input_queue.empty():
+                    print('Queue empty, clearing models')
+                    self.__models = [None, None]
+                    gc.collect()
+                else:
+                    self.print(f'Error: {e}')
+
+
         self.print('Finished...')
 
     def executeJob(self, job):
@@ -71,7 +82,7 @@ class Worker:
     
     def outputToImage(self, image_arr: np.array):
         img_size = floor(sqrt(image_arr.shape[1]))
-        print(img_size, sqrt(image_arr.shape[1]), image_arr.shape[1], image_arr.shape)
+
         image_arr *= 255
         image_arr = np.reshape(image_arr, (img_size, img_size), order="F")
         
@@ -91,8 +102,11 @@ class Worker:
             self.__models[model] = np.loadtxt(f'./data/H-{int(model+1)}.csv', delimiter=',', dtype=np.float64)
 
         return self.__models[model]
+    
+    def isModelLoaded(self):
+        return self.__models[0] is not None or self.__models[1] is not None
         
     def print(self, msg):
-        print(f'[{self.__pid}] Worker {self.__id}:', msg)     
+        print(f'[{self.__pid}] W{self.__id}:', msg)     
 
 
