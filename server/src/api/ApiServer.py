@@ -1,4 +1,6 @@
 from flask import Flask
+from gevent.pywsgi import WSGIServer
+
 from src.db import Database
 from src.manager import JobManager
 
@@ -19,5 +21,7 @@ class ApiServer:
         JobView.register(self.__app, route_base='/job', init_argument=(self.__db, self.__job_m, ...) )
 
     def run(self):
-        self.__app.run(port=5005, debug=True)
+        http_server = WSGIServer(('0.0.0.0', 5005), self.__app)
+        http_server.serve_forever()
+        # self.__app.run(port=5005, debug=True)
     
