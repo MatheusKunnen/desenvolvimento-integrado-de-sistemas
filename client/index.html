@@ -42,10 +42,12 @@
     <h2>Job Image:</h2>
     <pre id="jobImageText"></pre>
     <img id="jobImage" style="max-width: 100%; height: auto;" alt="Job Image">
-
+    <button id="downloadImage" onclick="downloadImage()">Download Image</button>
+    <canvas id="canvasElement" style="display: none;"></canvas>
     <script src="js/csvParser.js"></script>
     <script src="js/api.js"></script>
     <script src="js/job.js"></script>
     <script src="js/polling.js"></script>
+    <script src="js/imageHandler.js"></script> 
 </body>
 </html>
