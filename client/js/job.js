@@ -42,7 +42,7 @@ async function submitForm() {
 async function fetchJobDetails(jobId) {
     try {
         const response = await getJobDetails(jobId);
-        document.getElementById("jobDetails").textContent = JSON.stringify(response, null, 2);
+        document.getElementById("jobDetails").textContent = JSON.stringify(response.data, null, 2);
     } catch (error) {
         console.error('Error fetching job details:', error);
         document.getElementById("jobDetails").textContent = 'An error occurred while fetching job details.';
@@ -51,8 +51,10 @@ async function fetchJobDetails(jobId) {
 
 async function fetchJobImage(jobId) {
     try {
-        const imageUrl = await fetchJobImage(jobId);
-        document.getElementById("jobImage").src = imageUrl;
+        const response = await getJobImage(jobId);
+        console.log(response);
+        document.getElementById("jobImageText").textContent = response;
+        document.getElementById("jobImage").src = response;
     } catch (error) {
         console.error('Error fetching job image:', error);
         document.getElementById("jobImage").alt = 'An error occurred while fetching job image.';

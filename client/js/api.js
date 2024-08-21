@@ -32,7 +32,7 @@ async function getJobStatus(jobId) {
 }
 
 // Fetch job details
-async function fetchJobDetails(jobId) {
+async function getJobDetails(jobId) {
     const response = await fetch(`${baseUrl}/job/${jobId}`, {
         method: 'GET',
     });
@@ -45,7 +45,7 @@ async function fetchJobDetails(jobId) {
 }
 
 // Fetch job image
-async function fetchJobImage(jobId) {
+async function getJobImage(jobId) {
     const response = await fetch(`${baseUrl}/job/image/${jobId}`, {
         method: 'GET',
     });
