@@ -3,4 +3,5 @@ Flask-Classful==0.16.0
 gevent==24.2.1
 numpy==2.0.1
 pillow==10.4.0
+psutil==6.0.0
 SQLAlchemy==2.0.32
