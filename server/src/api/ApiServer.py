@@ -1,6 +1,7 @@
 from flask import Flask
 from gevent.pywsgi import WSGIServer
 
+from src.config import LocalConfig
 from src.db import Database
 from src.manager import JobManager
 
@@ -16,7 +17,10 @@ class ApiServer:
         self.__job_m = job_m
 
         if ApiServer.__FlaskApp is None:
-            ApiServer.__FlaskApp = Flask('ApiServer')
+            ApiServer.__FlaskApp = Flask(__name__,
+            static_url_path='', 
+            static_folder=LocalConfig.GetDefault().getClientFolderPath())
+            print(f'Serving client from {LocalConfig.GetDefault().getClientFolderPath()}')
 
         self.__app = ApiServer.__FlaskApp
 
@@ -24,6 +28,8 @@ class ApiServer:
         AnalyticsView.register(self.__app, route_base='/analytics', init_argument=(self.__analytics_db, ...) )
 
     def run(self):
-        http_server = WSGIServer(('0.0.0.0', 5005), self.__app)
+        port = LocalConfig.GetDefault().getApiPort()
+        http_server = WSGIServer(('0.0.0.0', port), self.__app, log=None)
+        print(f'Server started at http://localhost:{port}')
         http_server.serve_forever()
     

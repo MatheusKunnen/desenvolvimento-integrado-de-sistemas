@@ -94,6 +94,9 @@ class JobManager:
                 print(e)
 
     def monitorThreadEntry(self):
+        timeout = LocalConfig.GetDefault().getAnalyticsPollingTime()
+        verbose = LocalConfig.GetDefault().getAnalyticsVerbose()
+
         print('Monitor Thread started.')
         while True:
             try:
@@ -101,9 +104,10 @@ class JobManager:
                 
                 self.saveAnalyticsInfo(info)
 
-                # print('[MT]', 'MAIN=','CPU:', info['main_cpu_pct'],'RAM:', round(info['main_mem_rss']/1024), 'KiB', 'WORKERS=','CPU:', info['workers_cpu_pct'],'RAM:', round(info['workers_mem_rss']/1024), 'KiB', 'Jobs:', info['jobs_queue'])
+                if verbose:
+                    print('[MT]', 'MAIN=','CPU:', info['main_cpu_pct'],'RAM:', round(info['main_mem_rss']/1024), 'KiB', 'WORKERS=','CPU:', info['workers_cpu_pct'],'RAM:', round(info['workers_mem_rss']/1024), 'KiB', 'Jobs:', info['jobs_queue'])
 
-                sleep(1)
+                sleep(timeout)
             except Exception as e:
                 print(e)
 
