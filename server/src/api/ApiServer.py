@@ -17,7 +17,10 @@ class ApiServer:
         self.__job_m = job_m
 
         if ApiServer.__FlaskApp is None:
-            ApiServer.__FlaskApp = Flask('ApiServer')
+            ApiServer.__FlaskApp = Flask(__name__,
+            static_url_path='', 
+            static_folder=LocalConfig.GetDefault().getClientFolderPath())
+            print(f'Serving client from {LocalConfig.GetDefault().getClientFolderPath()}')
 
         self.__app = ApiServer.__FlaskApp
 

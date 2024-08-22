@@ -52,6 +52,9 @@ class LocalConfig:
     def getAnalyticsVerbose(self):
         return self.get('analytics_verbose', False)
     
+    def getClientFolderPath(self):
+        return self.get('client_folder_path', './client')
+    
     def get(self, key:str, default):
         if self.__config_data.get(key) is None:
             return default
