@@ -1,0 +1,22 @@
+// js/csvParser.js
+
+function parseCSV(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const text = event.target.result;
+            const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            const result = lines.map(line => {
+                return line.split(',').map(Number);
+            }).flat();
+            resolve(result);
+        };
+
+        reader.onerror = () => {
+            reject('Error reading the CSV file.');
+        };
+
+        reader.readAsText(file);
+    });
+}
