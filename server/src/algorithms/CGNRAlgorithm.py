@@ -22,7 +22,7 @@ class CGNRAlgorithm:
 
         error = self.max_error+1
         iterations = 0
-        while error > self.max_error:
+        while error > self.max_error and iterations < 100:
             iterations += 1
             # 𝐰𝐢=𝐇𝐩𝐢
             w = np.matmul(H, p)
