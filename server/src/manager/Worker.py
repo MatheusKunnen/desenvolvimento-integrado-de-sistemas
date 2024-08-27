@@ -50,6 +50,9 @@ class Worker:
             algo = CGNRAlgorithm(H, max_error=self.__max_error)
             
             signal = self.getSignal(job["signal"])
+
+            if job["use_gain"]:
+                signal = self.applyGainToSignal(signal, job["model"])
             
             output, it, error  = algo.processSignal(signal)
 
@@ -74,11 +77,24 @@ class Worker:
             self.print(f'Job {job["job_id"]} FAILED')
             raise e
         
-    def getSignal(self, raw_signal: bytes):
+    def getSignal(self, raw_signal: bytes, use_gain: bool):
         data = json.loads(raw_signal.decode('utf-8'))
         signal = np.array(data, dtype=np.float64)
         signal.shape = (signal.shape[0], 1)
         return signal
+    
+    def applyGainToSignal(self, signal, model:int):
+        N = 64
+        S = 436 if model == 1 else 794
+
+        signal = np.reshape(signal, (S, N))
+        
+        for c in range(N):
+            for l in range(S):
+                gain = 100 + (1 / 20) * (c + 1) * np.sqrt(c + 1)
+                signal[l, c] *=  gain
+        
+        return signal.flatten()
     
     def outputToImage(self, image_arr: np.array):
         img_size = floor(sqrt(image_arr.shape[1]))
