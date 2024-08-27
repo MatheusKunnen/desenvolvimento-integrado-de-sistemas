@@ -85,9 +85,11 @@ class AnalyticsView(FlaskView):
                 w_data['cpu_max'] = worker["cpu"].max()
                 w_data['cpu_mean'] = worker["cpu"].mean()
                 w_data['cpu_min'] = worker["cpu"].min()
+                w_data['cpu_last'] = worker["cpu"][0]
                 w_data['mem_rss_max'] = f'{np.round(worker["rss"].max()*mem_unit_scale)} {mem_unit}'
                 w_data['mem_rss_mean'] = f'{np.round(worker["rss"].mean()*mem_unit_scale)} {mem_unit}'
                 w_data['mem_rss_min'] = f'{np.round(worker["rss"].min()*mem_unit_scale)} {mem_unit}'
+                w_data['mem_rss_min'] = f'{np.round(worker["rss"][0]*mem_unit_scale)} {mem_unit}'
                 
                 workers_summary.append(w_data)
 
@@ -98,15 +100,19 @@ class AnalyticsView(FlaskView):
             data['main_cpu_max'] = main_cpu.max()
             data['main_cpu_mean'] = main_cpu.mean()
             data['main_cpu_min'] = main_cpu.min()
+            data['main_cpu_last'] = main_cpu[0]
             data['main_mem_rss_max'] = f'{np.round(main_mem_rss.max()*mem_unit_scale)} {mem_unit}'
             data['main_mem_rss_mean'] = f'{np.round(main_mem_rss.mean()*mem_unit_scale)} {mem_unit}'
             data['main_mem_rss_min'] = f'{np.round(main_mem_rss.min()*mem_unit_scale)} {mem_unit}'
+            data['main_mem_rss_last'] = f'{np.round(main_mem_rss[0]*mem_unit_scale)} {mem_unit}'
             data['workers_cpu_max'] = workers_cpu.max()
             data['workers_cpu_mean'] = workers_cpu.mean()
             data['workers_cpu_min'] = workers_cpu.min()
+            data['workers_cpu_last'] = workers_cpu[0]
             data['workers_mem_rss_max'] = f'{np.round(workers_mem_rss.max()*mem_unit_scale)} {mem_unit}'
             data['workers_mem_rss_mean'] = f'{np.round(workers_mem_rss.mean()*mem_unit_scale)} {mem_unit}'
             data['workers_mem_rss_min'] = f'{np.round(workers_mem_rss.min()*mem_unit_scale)} {mem_unit}'
+            data['workers_mem_rss_last'] = f'{np.round(workers_mem_rss[0]*mem_unit_scale)} {mem_unit}'
             data['workers_summary'] = workers_summary
 
             return { 'data': data };
