@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Form</title>
+</head>
+<body>
+    <h1>Request Form</h1>
+    
+    <form id="requestForm">
+        <label for="user">User:</label>
+        <input type="text" id="user" name="user" required><br><br>
+
+        <label for="useGain">Use Gain:</label>
+        <input type="checkbox" id="useGain" name="useGain"><br><br>
+
+        <label for="model">Model:</label>
+        <select id="model" name="model" required>
+            <option value="1">Model 1</option>
+            <option value="2">Model 2</option>
+        </select><br><br>
+
+        <label for="signal">Signal (CSV file):</label>
+        <input type="file" id="signalFile" name="signalFile" accept=".csv" required><br><br>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <!-- <h2>Form Data:</h2>
+    <pre id="output"></pre> -->
+
+    <h2>Response:</h2>
+    <pre id="response"></pre>
+
+    <h2>Job Status:</h2>
+    <pre id="jobStatus"></pre>
+
+    <h2>Job Details:</h2>
+    <pre id="jobDetails"></pre>
+
+    <h2>Job Image:</h2>
+    <pre id="jobImageText"></pre>
+    <img id="jobImage" style="max-width: 100%; height: auto;" alt="Job Image">
+    <button id="downloadImage" onclick="downloadImage()">Download Image</button>
+    <canvas id="canvasElement" style="display: none;"></canvas>
+    <script src="js/csvParser.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/job.js"></script>
+    <script src="js/polling.js"></script>
+    <script src="js/imageHandler.js"></script> 
+</body>
+</html>
