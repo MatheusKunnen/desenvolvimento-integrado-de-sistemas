@@ -1,4 +1,4 @@
-const baseUrl = 'http://localhost:5005'; // Replace with your actual base URL if needed
+const baseUrl = 'http://localhost:5005';
 
 // Submit a job request
 async function submitJobRequest(requestData) {

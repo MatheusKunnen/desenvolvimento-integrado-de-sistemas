@@ -2,7 +2,6 @@ async function submitForm() {
     // Get form values
     const user = document.getElementById("user").value;
     const useGain = document.getElementById("useGain").checked;
-    const model = parseInt(document.getElementById("model").value);
     const signalFile = document.getElementById("signalFile").files[0];
 
     // Ensure a file was selected
@@ -14,6 +13,8 @@ async function submitForm() {
     try {
         // Parse the CSV file into an array
         const signal = await parseCSV(signalFile);
+        const model = checkSignalSize(signal);
+
 
         // Create the request object
         const requestData = {

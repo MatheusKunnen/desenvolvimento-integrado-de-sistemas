@@ -48,10 +48,6 @@ class ClientGenerator:
         if random.choice([True, False]):
             use_gain_checkbox.click()
 
-        model_select = Select(driver.find_element(By.ID, 'model'))
-        # model_select.select_by_value(str(random.choice([1, 2]))) # uncomment this line to select a random model
-        model_select.select_by_value(str(2)) # comment this line if you want to select a random model
-
         signal_file_input = driver.find_element(By.ID, 'signalFile')
         signal_file_input.send_keys(random.choice(self.signal_files))
 

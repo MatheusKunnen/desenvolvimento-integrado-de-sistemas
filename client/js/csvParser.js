@@ -20,3 +20,13 @@ function parseCSV(file) {
         reader.readAsText(file);
     });
 }
+
+function checkSignalSize(signal) {
+    if (signal.length == 27904) {
+        return "2";
+    } else if (signal.length == 50816) {
+        return "1";
+    } else {
+        console.log("Error: Signal size is not correct.");
+    }
+}
