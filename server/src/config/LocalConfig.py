@@ -38,13 +38,13 @@ class LocalConfig:
         return self.get('max_error', 1e-6)
     
     def getModelClearTimeout(self):
-        return self.get('model_clear_timeout', 30)
+        return self.get('model_clear_timeout', 0.5)
     
     def getModelMaxError(self):
         return self.get('model_max_error', 1e-6)
     
     def getMaxModelWorkers(self):
-        return self.get('max_model_workers', math.floor(os.cpu_count()/2))
+        return self.get('max_model_workers', math.floor(os.cpu_count()*0.8))
     
     def getAnalyticsPollingTime(self):
         return self.get('analytics_polling_time', 1)

@@ -7,16 +7,17 @@ from math import sqrt, floor
 from io import BytesIO
 from PIL import Image
 from datetime import datetime
-from multiprocessing import Queue
+from multiprocessing import Queue, Event
 
 from src.algorithms import CGNRAlgorithm
 
 class Worker:
-    def __init__(self, id:int, input_queue:Queue, output_queue:Queue, models_timeout_s: int = 30, max_error=1e-6):
+    def __init__(self, id:int, input_queue:Queue, output_queue:Queue, event, models_timeout_s: int = 0.25, max_error=1e-6):
         self.__id = id
         self.__pid = os.getpid()
         self.__input_queue = input_queue
         self.__output_queue = output_queue
+        self.__event = event
         self.__models_timeout_s = models_timeout_s
         self.__max_error = max_error
         self.__models = [None, None]
@@ -24,10 +25,9 @@ class Worker:
 
     def run(self):
         self.print('Running...')
-        while True:
+        while self.__event.is_set():
             try:
-                timeout = self.__models_timeout_s if self.isModelLoaded() else None
-                job = self.__input_queue.get(timeout=timeout)
+                job = self.__input_queue.get(timeout=self.__models_timeout_s)
                 
                 output = self.executeJob(job)
 
@@ -35,13 +35,22 @@ class Worker:
                 gc.collect()
             except Exception as e:
                 if self.__input_queue.empty():
-                    self.print('Queue empty, clearing models')
-                    self.__models = [None, None]
-                    self.__gain_models = [None, None]
-                    gc.collect()
+                    pass
+                #     if self.isModelLoaded():
+                #         self.print('Queue empty, clearing models')
+                #         self.__models = [None, None]
+                #         self.__gain_models = [None, None]
+                #         gc.collect()
                 else:
                     self.print(f'Error: {e}')
-        self.print('Finished...')
+        
+        self.__models = [None, None]
+        self.__gain_models = [None, None]
+        gc.collect()
+        
+        self.__event.set()
+        self.print('Terminated...')
+        exit(0)
 
     def executeJob(self, job):
         self.print(f'Starting job {job["job_id"]}')

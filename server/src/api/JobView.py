@@ -32,7 +32,22 @@ class JobView(FlaskView):
             if job is not None:
                 self.__job_m.addJob(job.getQueueDict())
 
-    
+    def index(self):
+        session = self.__db.getSession()
+        try:
+            limit = int(request.args.get('limit')) if request.args.get('limit') is not None else 100
+            
+            query = session.query(Job).order_by(Job.created_at.desc()).limit(limit)
+
+            if query.count() == 0:
+                return {'error':f"No jobs not found"}, 404
+
+            jobs = query.all()
+
+            return {'data':[job.getDict() for job in jobs]};            
+        finally:
+            session.close()
+
     def get(self, job_id):
         session = self.__db.getSession()
         try:

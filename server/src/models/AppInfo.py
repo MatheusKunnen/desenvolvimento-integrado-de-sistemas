@@ -16,8 +16,12 @@ class AppInfo(AnalyticsBase):
     workers_cpu_pct = Column(Float, nullable=False)
     workers_mem_rss = Column(Integer, nullable=False)
     jobs_queue = Column(Integer, nullable=False)
+    jobs_queue_1 = Column(Integer, nullable=False)
+    jobs_queue_2 = Column(Integer, nullable=False)
     results_queue = Column(Integer, nullable=False)
     workers = Column(Integer, nullable=False)
+    workers_model_1 = Column(Integer, nullable=False)
+    workers_model_2 = Column(Integer, nullable=False)
     workers_info = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
         
@@ -29,8 +33,12 @@ class AppInfo(AnalyticsBase):
                     'workers_cpu_pct': self.workers_cpu_pct,
                     'workers_mem_rss': self.workers_mem_rss,
                     'jobs_queue': self.jobs_queue,
+                    'jobs_queue_1': self.jobs_queue_1,
+                    'jobs_queue_2': self.jobs_queue_2,
                     'results_queue': self.results_queue,
                     'workers': self.workers,
+                    'workers_model_1': self.workers_model_1,
+                    'workers_model_2': self.workers_model_2,
                     'workers_info': AppInfo.__GetJSON(self.workers_info) if not minimal else None,
                     'created_at': self.created_at.isoformat()
                 })
@@ -47,6 +55,10 @@ class AppInfo(AnalyticsBase):
             results_queue = data['results_queue'],
             workers = data['workers'],
             workers_info = data['workers_info'],
+            jobs_queue_1 = data['jobs_queue_1'],
+            jobs_queue_2 = data['jobs_queue_2'],
+            workers_model_1 = data['workers_model_1'],
+            workers_model_2 = data['workers_model_2'],
             created_at = data['created_at']
         )
     
