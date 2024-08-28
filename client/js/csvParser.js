@@ -1,5 +1,3 @@
-// js/csvParser.js
-
 function parseCSV(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
