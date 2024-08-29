@@ -4,10 +4,7 @@ async function pollJobStatus(jobId) {
     const checkStatus = async () => {
         try {
             const response = await getJobStatus(jobId);
-            // console.log(jobId);
-            // console.log(response);
-
-            // Update the status in the UI
+            
             statusElement.textContent = `Job ID: ${jobId}\nStatus: ${response.data.status}`;
 
             if (response.data.status === 'done') {
