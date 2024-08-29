@@ -1,6 +1,8 @@
 import time
 import os
 import random
+from multiprocessing import Process
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
@@ -8,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+
 from config import LocalConfig
 
 class ClientGenerator:
@@ -74,15 +77,33 @@ class ClientGenerator:
             print(f"An error occurred while waiting for the image: {e}")
 
     def run(self):
+        time.sleep(random.random()*2)
+        driver = self.init_driver()
         while True:
-            driver = self.init_driver()
             try:
                 self.create_client(driver)
                 self.download_image(driver)
             finally:
-                driver.quit()
-            time.sleep(20)
+                # driver.quit()
+                pass
+            time.sleep(random.random()*5)
 
-if __name__ == "__main__":
+def client_entry(id):
+    print('Generator', id, 'starting')
     generator = ClientGenerator()
     generator.run()
+    print('Generator', id, 'finished')
+
+N_WORKERS = 8
+def main():
+    processes = []
+    for i in range(N_WORKERS):
+        p = Process(target=client_entry, args=(i, ), daemon=True)
+        processes.append(p)
+        p.start()
+    
+    for p in processes:
+        p.join()
+
+if __name__ == "__main__":
+    main()
